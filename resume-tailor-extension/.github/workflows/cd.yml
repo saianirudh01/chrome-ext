@@ -1,0 +1,31 @@
+name: CD Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create Zip Bundle
+        run: |
+          zip -r resume-tailor-v${{ github.ref_name }}.zip . -x "*.git*" -x ".github/*" -x "node_modules/*" -x "*.zip"
+          echo "✅ Bundle created: resume-tailor-v${{ github.ref_name }}.zip"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: resume-tailor-v${{ github.ref_name }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Instructions
+        run: |
+          echo "Upload this zip to Chrome Web Store at https://chrome.google.com/webstore/devconsole"
+          # Note: Chrome Web Store API upload can be added later using mnao305/chrome-extension-upload@v4

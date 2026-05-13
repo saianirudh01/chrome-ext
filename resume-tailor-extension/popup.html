@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=480, initial-scale=1.0">
+  <title>Resume Tailor AI</title>
+  <link rel="stylesheet" href="styles/popup.css">
+  <script src="libs/pdf.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>✨ Resume Tailor AI</h1>
+  </header>
+
+  <main>
+    <section class="step">
+      <div class="step-header">
+        <span class="badge">1</span>
+        <h2>Upload Base Resume</h2>
+      </div>
+      <div class="file-upload" id="drop-zone">
+        <input type="file" id="resume-upload" accept=".pdf,.txt" hidden>
+        <label for="resume-upload" class="upload-label">
+          <span class="icon">📄</span>
+          <span id="file-name">Click to select PDF or TXT</span>
+        </label>
+      </div>
+      <div id="file-stats" class="stats hidden"></div>
+    </section>
+
+    <section class="step">
+      <div class="step-header">
+        <span class="badge">2</span>
+        <h2>Gemini API Key</h2>
+      </div>
+      <div class="input-group">
+        <input type="password" id="api-key" placeholder="Enter Gemini API Key">
+        <button id="toggle-key" title="Toggle visibility">👁️</button>
+      </div>
+      <a href="https://aistudio.google.com" target="_blank" class="helper-link">Get free key at aistudio.google.com</a>
+    </section>
+
+    <section class="step">
+      <div class="step-header">
+        <span class="badge">3</span>
+        <h2>Job Description</h2>
+        <button id="auto-scrape" class="btn secondary small">Auto-Scrape from Page</button>
+      </div>
+      <textarea id="job-description" rows="10" placeholder="Paste the job description here, or use the Auto-Scrape button..."></textarea>
+    </section>
+
+    <button id="tailor-btn" class="btn primary full-width">✨ Tailor My Resume</button>
+
+    <div id="status-bar" class="status-bar idle">Ready</div>
+
+    <section id="output-section" class="hidden">
+      <h3>Tailored Resume</h3>
+      <textarea id="output-text" readonly></textarea>
+      <div class="actions">
+        <button id="download-btn" class="btn download">📄 Download TXT</button>
+        <button id="copy-btn" class="btn download">📋 Copy to Clipboard</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Your resume is processed locally. API key stored on your device only.
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>
