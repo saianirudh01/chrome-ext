@@ -2,9 +2,11 @@ node_modules/
 dist/
 *.zip
 .env
+.env.*
 .DS_Store
 Thumbs.db
 *.log
 .vscode/
-*secret*
+*.secret
 *apikey*
+*api_key*

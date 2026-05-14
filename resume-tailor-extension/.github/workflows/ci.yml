@@ -1,48 +1,76 @@
-name: CI
+name: CI — Validate Extension
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
 
 jobs:
   validate:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Validate manifest.json structure
+      - name: Validate manifest.json exists and is valid JSON
         run: |
           node -e "
-          const fs = require('fs');
-          const manifest = JSON.parse(fs.readFileSync('manifest.json','utf8'));
-          if (!manifest.name) throw new Error('Missing name in manifest');
-          if (!manifest.version) throw new Error('Missing version in manifest');
-          if (manifest.manifest_version !== 3) throw new Error('manifest_version must be 3');
-          console.log('✅ manifest.json is valid');
+            const fs = require('fs');
+            const m = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
+            const required = ['name', 'version', 'manifest_version'];
+            required.forEach(f => {
+              if (!m[f]) throw new Error('manifest.json missing field: ' + f);
+            });
+            if (m.manifest_version !== 3) throw new Error('Must be Manifest V3');
+            console.log('✅ manifest.json valid:', m.name, 'v' + m.version);
           "
 
-      - name: Check required files exist
+      - name: Check all required files exist
         run: |
-          for file in popup.html popup.js content.js background.js; do
-            if [ ! -f "$file" ]; then
-              echo "Error: $file does not exist."
+          files=(
+            "popup.html" "popup.js" "content.js"
+            "background.js" "styles/popup.css"
+            "libs/mammoth.min.js" "libs/docx.umd.min.js"
+            "libs/pdf.min.js"
+            "libs/pdf.worker.min.js"
+          )
+          for f in "${files[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "❌ Missing required file: $f"
               exit 1
             fi
+            echo "✅ Found: $f"
           done
-          echo "✅ All required files exist."
 
-      - name: Scan for hardcoded API keys
+      - name: Check for hardcoded API keys in source
         run: |
-          if grep -rn "AIza" --include=\*.js . ; then
-            echo "❌ Error: Found potential hardcoded Google API key (starts with AIza)."
+          # Gemini keys start with AIza
+          if grep -r "AIza" . --include="*.js" --include="*.html" --exclude-dir=".git"; then
+            echo "❌ Hardcoded API key found in source! Use chrome.storage.local instead."
             exit 1
+          fi
+          echo "✅ No hardcoded API keys found"
+
+      - name: Check for inline event handlers (MV3 CSP violation)
+        run: |
+          if grep -n "onclick=\"\|onchange=\"\|onsubmit=\"" popup.html; then
+            echo "❌ Inline event handlers found — MV3 CSP blocks these. Use addEventListener."
+            exit 1
+          fi
+          echo "✅ No inline event handlers"
+
+      - name: Confirm chrome.storage.local used for key (not .env or hardcode)
+        run: |
+          if grep -n "\.env\|process\.env\|GEMINI_API_KEY\s*=" popup.js; then
+            echo "❌ .env pattern found — use chrome.storage.local for key storage in extensions"
+            exit 1
+          fi
+          if grep -q "chrome.storage.local" popup.js; then
+            echo "✅ API key correctly stored in chrome.storage.local"
           else
-            echo "✅ No hardcoded API keys found."
+            echo "❌ chrome.storage.local not found in popup.js"
+            exit 1
           fi
 
-      - name: Summary
-        run: echo "✅ All checks passed — extension is valid"
+      - name: All checks passed
+        run: echo "✅ Extension is valid and ready to load"

@@ -1,17 +1,13 @@
-// background.js
-
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.local.get(['apiKey', 'baseResume', 'resumeFilename', 'lastJD'], (result) => {
-    const defaults = {};
-    if (result.apiKey === undefined) defaults.apiKey = "";
-    if (result.baseResume === undefined) defaults.baseResume = "";
-    if (result.resumeFilename === undefined) defaults.resumeFilename = "";
-    if (result.lastJD === undefined) defaults.lastJD = "";
-    
-    if (Object.keys(defaults).length > 0) {
-      chrome.storage.local.set(defaults);
-    }
-  });
-  
-  console.log("Resume Tailor AI installed");
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === 'install') {
+    // Set default storage structure on fresh install
+    // API key starts empty — user provides their own
+    chrome.storage.local.set({
+      geminiApiKey: '',      // user's Gemini API key — stored here, never in code
+      baseResume: '',        // extracted text from uploaded .docx
+      resumeFilename: '',    // display name for the UI
+      lastJD: ''             // last job description for convenience
+    });
+    console.log('Resume Tailor AI installed. API key will be stored in chrome.storage.local');
+  }
 });
