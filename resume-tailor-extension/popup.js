@@ -386,7 +386,7 @@ JOB DESCRIPTION
 ════════════════════════════════════════
 ${jd.substring(0, 2500)}
 
-Write the complete tailored resume now:\`;
+Write the complete tailored resume now:`;
 }
 
 async function buildDocx(tailoredText) {
