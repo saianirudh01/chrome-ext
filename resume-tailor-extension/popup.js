@@ -245,122 +245,418 @@ function attachEventListeners() {
 }
 
 function buildPrompt(resumeText, jd) {
-  return `You are a world-class resume writer and ATS specialist with 15+ years of experience.
+  return `You are a world-class ATS specialist, resume writer, and career coach
+with 20+ years of experience helping candidates pass ATS systems and land
+interviews at top companies. You understand exactly how ATS parsers work and
+what recruiters look for in the first 6 seconds of reading a resume.
 
-Your task: Rewrite the candidate's resume to perfectly match the job description below.
-The output will be inserted back into a Word document, so format it as clean structured text.
+════════════════════════════════════════
+TASK
+════════════════════════════════════════
+Rewrite the candidate's resume to perfectly match the job description below.
+The output must pass ATS screening with a near-perfect keyword match score
+AND read as a compelling, human-written document to the recruiter who reviews it.
 
-STRICT RULES:
-1. NEVER fabricate skills, tools, companies, or achievements the candidate didn't have
-2. DO reframe and reword existing experience to align with JD keywords naturally
-3. DO reorder bullet points to surface the most relevant experience first
-4. Embed exact keywords from the JD naturally — this is critical for ATS parsing
-5. Use strong action verbs: Led, Built, Reduced, Increased, Shipped, Automated, Designed
-6. Keep every number and metric from the original resume exactly as-is
-7. Sound like a confident real human wrote this — no buzzword soup
-8. Use these section headers exactly (in CAPS): SUMMARY, EXPERIENCE, EDUCATION, SKILLS, PROJECTS
-9. Format each job as: Job Title — Company, Location (Start – End)
-10. Format bullets starting with a dash: - Bullet text here
-11. Output ONLY the resume text — no preamble, no "Here is your resume", start with the name
+════════════════════════════════════════
+ATS OPTIMISATION RULES (critical — follow every one)
+════════════════════════════════════════
+1. Extract EVERY meaningful keyword, skill, tool, technology, methodology,
+   and qualification from the job description below.
+   Include: hard skills, soft skills, tools, frameworks, certifications,
+   industry terms, action verbs, and any domain-specific vocabulary.
 
-CANDIDATE'S CURRENT RESUME:
----
+2. Naturally embed ALL of those keywords into the resume. Do not stuff them
+   awkwardly — weave them into bullet points and the summary so they read
+   naturally. ATS scanners match exact strings, so spelling and casing must
+   match the JD exactly (e.g. if JD says "Node.js" write "Node.js" not "NodeJS").
+
+3. If the candidate's original resume is missing a keyword that appears in the JD:
+   - If it is a soft skill or general methodology (e.g. "cross-functional
+     collaboration", "agile", "stakeholder management") — ADD it naturally
+     into the summary or a bullet point where it fits contextually.
+   - If it is a specific hard skill or tool the candidate clearly never used —
+     DO NOT fabricate it. Instead, reference adjacent skills they do have.
+
+4. Mirror the exact job title from the JD in the candidate's most recent role
+   if it is reasonably close to their actual title. This is legal and standard
+   practice — ATS systems rank exact title matches higher.
+
+5. Include a SKILLS section with a clean comma-separated list of every relevant
+   technical skill, tool, and technology pulled from both the JD and the
+   candidate's background. This is the highest-weight ATS section.
+
+════════════════════════════════════════
+CONTENT QUALITY RULES
+════════════════════════════════════════
+6. Every bullet point must follow this formula:
+   [Strong action verb] + [what you did] + [how/with what] + [measurable result]
+   Example: "Reduced API response latency by 40% by migrating monolithic
+   endpoints to asynchronous FastAPI microservices"
+
+7. Use ONLY these action verbs — they are proven to score high with ATS and
+   impress recruiters:
+   Architected, Automated, Built, Collaborated, Delivered, Deployed, Designed,
+   Developed, Drove, Engineered, Established, Executed, Generated, Implemented,
+   Increased, Integrated, Launched, Led, Managed, Mentored, Migrated, Optimised,
+   Owned, Reduced, Scaled, Shipped, Spearheaded, Streamlined, Transformed
+
+8. Keep every number and metric from the original resume exactly as-is.
+   If a bullet has no metric, add a realistic qualifier like "across a team of 6"
+   or "within a 3-month timeline" — do not invent percentages or dollar figures.
+
+9. The summary (3-4 lines) must:
+   - Open with the exact job title from the JD
+   - Mention years of experience
+   - Include 4-6 keywords from the JD naturally
+   - End with a value proposition sentence
+
+10. Do NOT use generic filler phrases:
+    Never write: "results-driven", "passionate about", "detail-oriented",
+    "self-starter", "team player", "dynamic", "synergy", "leverage",
+    "thought leader", "guru", "ninja", "rockstar"
+    These are ATS noise and recruiter red flags.
+
+════════════════════════════════════════
+FORMAT RULES (these control the docx output — follow exactly)
+════════════════════════════════════════
+11. Output the resume as plain structured text only.
+    No markdown, no asterisks, no # symbols, no HTML, no bold markers.
+    Formatting is applied by the document builder — your job is clean text.
+
+12. Use EXACTLY this structure and EXACTLY these section header names in CAPS:
+
+    [Candidate Full Name]
+    [Email] | [Phone] | [LinkedIn or Portfolio URL] | [City, Country]
+
+    SUMMARY
+    [3-4 line paragraph]
+
+    EXPERIENCE
+    [Job Title] — [Company Name], [City] | [Month Year] - [Month Year or Present]
+    - [Bullet point]
+    - [Bullet point]
+    - [Bullet point — 3 to 5 bullets per role, each under 2 lines]
+
+    SKILLS
+    [Comma-separated single line list of all relevant skills and tools]
+
+    EDUCATION
+    [Degree] in [Field] — [University Name], [Year]
+
+    PROJECTS (include only if present in original resume)
+    [Project Name] | [Tech stack used]
+    - [One line describing impact or outcome]
+
+    CERTIFICATIONS (include only if present in original resume)
+    [Certification Name] — [Issuing Body], [Year]
+
+13. Section header format: single word or two words, ALL CAPS, on its own line,
+    no colon, no period, no decoration. Exactly as shown above.
+
+14. Job entry format: "Job Title — Company, City | Date - Date"
+    Use an em dash between title and company.
+    Use a pipe between company/city and dates.
+
+15. Bullet points: start each with a dash and space: "- "
+    Never use asterisks, dots, or other markers.
+
+16. Contact line: all on ONE line separated by pipe characters " | "
+    Never put contact info on multiple lines.
+
+17. Fit everything in ONE PAGE worth of content.
+    For candidates with under 5 years experience: max 3 bullet points per role,
+    max 2 roles in experience section if needed to fit.
+    For candidates with 5-10 years: max 4 bullet points per role, max 3 roles.
+    For senior candidates (10+ years): max 5 bullet points per role, max 3 roles,
+    oldest roles summarised in one line.
+    Skills line: maximum 18 skills, comma separated, single line.
+    Summary: strictly 3-4 lines, no more.
+
+18. Output ONLY the resume. Start directly with the candidate's name on line 1.
+    No preamble. No "Here is your tailored resume". No explanation after.
+    No sign-off. The document ends after the last line of content.
+
+════════════════════════════════════════
+CANDIDATE'S CURRENT RESUME
+════════════════════════════════════════
 ${resumeText.substring(0, 3500)}
----
 
-JOB DESCRIPTION:
----
+════════════════════════════════════════
+JOB DESCRIPTION
+════════════════════════════════════════
 ${jd.substring(0, 2500)}
----
 
-Write the complete tailored resume now:`;
+Write the complete tailored resume now:\`;
 }
 
 async function buildDocx(tailoredText) {
-  const { Document, Paragraph, TextRun, HeadingLevel, AlignmentType,
-          BorderStyle, Packer } = docx;
+  const {
+    Document, Paragraph, TextRun, AlignmentType,
+    BorderStyle, Packer
+  } = docx;
 
-  const lines = tailoredText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  const lines = tailoredText
+    .split('\n')
+    .map(l => l.trim());
+
   const children = [];
 
-  // Section headers Gemini will output in ALL CAPS
-  const SECTION_HEADERS = ['SUMMARY', 'EXPERIENCE', 'EDUCATION', 'SKILLS',
-                            'PROJECTS', 'CERTIFICATIONS', 'AWARDS'];
+  const SECTION_HEADERS = [
+    'SUMMARY', 'EXPERIENCE', 'EDUCATION', 'SKILLS',
+    'PROJECTS', 'CERTIFICATIONS', 'AWARDS', 'PUBLICATIONS'
+  ];
+
+  // Font — Calibri is the gold standard ATS-safe font
+  // Clean, professional, universally readable, parsed correctly by all major ATS
+  const FONT       = 'Calibri';
+  const SIZE_NAME  = 28;        // 14pt — candidate name
+  const SIZE_HEAD  = 20;        // 10pt — section headers
+  const SIZE_BODY  = 20;        // 10pt — all body text
+  const SIZE_SMALL = 18;        // 9pt  — contact line and dates
+  const COLOR_NAME = '1A1A2E';  // near-black for name
+  const COLOR_HEAD = '16213E';  // dark navy for section headers
+  const COLOR_BODY = '2D2D2D';  // dark gray for body text
+  const COLOR_DATE = '555555';  // muted gray for dates and company
+  const COLOR_LINE = 'C0C0C0';  // light gray for section divider lines
 
   lines.forEach((line, index) => {
-    // First line = candidate name (largest heading)
+    if (!line) {
+      // Blank line — minimal spacing only, do not waste vertical space
+      children.push(new Paragraph({ spacing: { after: 40 } }));
+      return;
+    }
+
+    // Line 1: Candidate name — centered, bold, largest size
     if (index === 0) {
       children.push(new Paragraph({
-        children: [new TextRun({ text: line, bold: true, size: 28, font: 'Calibri' })],
+        children: [
+          new TextRun({
+            text: line,
+            bold: true,
+            size: SIZE_NAME,
+            font: FONT,
+            color: COLOR_NAME,
+          })
+        ],
         alignment: AlignmentType.CENTER,
-        spacing: { after: 80 }
+        spacing: { before: 0, after: 60 },
       }));
       return;
     }
 
-    // Second line might be contact info (email, phone, LinkedIn)
-    if (index === 1 && (line.includes('@') || line.includes('|') || line.includes('·'))) {
-      children.push(new Paragraph({
-        children: [new TextRun({ text: line, size: 20, color: '555555', font: 'Calibri' })],
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 200 }
-      }));
-      return;
-    }
-
-    // ALL CAPS section headers
-    if (SECTION_HEADERS.some(h => line.toUpperCase() === h)) {
-      children.push(new Paragraph({
-        children: [new TextRun({ text: line.toUpperCase(), bold: true, size: 24,
-                                  font: 'Calibri', color: '1F3864' })],
-        spacing: { before: 240, after: 80 },
-        border: {
-          bottom: { color: '1F3864', space: 4, style: BorderStyle.SINGLE, size: 6 }
-        }
-      }));
-      return;
-    }
-
-    // Job title lines: "Job Title — Company, Location (Date – Date)"
-    if (line.includes('—') || (line.includes(',') && line.includes('('))) {
-      const parts = line.split('—');
+    // Line 2: Contact info — centered, small, muted
+    if (index === 1 && (
+      line.includes('@') || line.includes('|') ||
+      line.includes('linkedin') || line.includes('+')
+    )) {
       children.push(new Paragraph({
         children: [
-          new TextRun({ text: parts[0]?.trim() || line, bold: true, size: 22, font: 'Calibri' }),
-          parts[1] ? new TextRun({ text: ' — ' + parts[1].trim(), size: 22,
-                                    color: '555555', font: 'Calibri' }) : null
-        ].filter(Boolean),
-        spacing: { before: 160, after: 40 }
+          new TextRun({
+            text: line,
+            size: SIZE_SMALL,
+            font: FONT,
+            color: COLOR_DATE,
+          })
+        ],
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 0, after: 160 },
       }));
       return;
     }
 
-    // Bullet points starting with - or ·
-    if (line.startsWith('-') || line.startsWith('·') || line.startsWith('•')) {
-      const bulletText = line.replace(/^[-·•]\s*/, '');
+    // Section headers — ALL CAPS, bold, dark navy, underlined with thin gray border
+    if (SECTION_HEADERS.includes(line.toUpperCase())) {
       children.push(new Paragraph({
-        children: [new TextRun({ text: bulletText, size: 20, font: 'Calibri' })],
-        bullet: { level: 0 },
-        spacing: { after: 40 }
+        children: [
+          new TextRun({
+            text: line.toUpperCase(),
+            bold: true,
+            size: SIZE_HEAD,
+            font: FONT,
+            color: COLOR_HEAD,
+            allCaps: true,
+          })
+        ],
+        spacing: { before: 200, after: 60 },
+        border: {
+          bottom: {
+            color: COLOR_LINE,
+            space: 4,
+            style: BorderStyle.SINGLE,
+            size: 4,
+          }
+        },
+        alignment: AlignmentType.LEFT,
       }));
       return;
     }
 
-    // Default: normal paragraph
+    // Job title lines: "Title — Company, City | Date - Date"
+    // Detected by presence of pipe | and dash — and not starting with -
+    if (
+      (line.includes('—') || line.includes('-')) &&
+      line.includes('|') &&
+      !line.startsWith('-')
+    ) {
+      const pipeIdx   = line.lastIndexOf('|');
+      const roleInfo  = pipeIdx > -1 ? line.substring(0, pipeIdx).trim() : line;
+      const dateInfo  = pipeIdx > -1 ? line.substring(pipeIdx + 1).trim() : '';
+      const dashIdx   = roleInfo.indexOf('—');
+      const titlePart   = dashIdx > -1 ? roleInfo.substring(0, dashIdx).trim() : roleInfo;
+      const companyPart = dashIdx > -1 ? roleInfo.substring(dashIdx + 1).trim() : '';
+
+      children.push(new Paragraph({
+        children: [
+          new TextRun({
+            text: titlePart,
+            bold: true,
+            size: SIZE_BODY,
+            font: FONT,
+            color: COLOR_BODY,
+          }),
+          companyPart ? new TextRun({
+            text: ' — ' + companyPart,
+            size: SIZE_BODY,
+            font: FONT,
+            color: COLOR_DATE,
+          }) : null,
+          dateInfo ? new TextRun({
+            text: '  |  ' + dateInfo,
+            size: SIZE_SMALL,
+            font: FONT,
+            color: COLOR_DATE,
+            italics: true,
+          }) : null,
+        ].filter(Boolean),
+        spacing: { before: 120, after: 40 },
+        alignment: AlignmentType.LEFT,
+      }));
+      return;
+    }
+
+    // Bullet points — lines starting with "- "
+    if (line.startsWith('- ') || line.startsWith('* ') || line.startsWith('• ')) {
+      const bulletText = line.replace(/^[-*•]\s*/, '');
+      children.push(new Paragraph({
+        children: [
+          new TextRun({
+            text: bulletText,
+            size: SIZE_BODY,
+            font: FONT,
+            color: COLOR_BODY,
+          })
+        ],
+        bullet: { level: 0 },
+        spacing: { before: 20, after: 20 },
+        alignment: AlignmentType.LEFT,
+        indent: { left: 360, hanging: 180 },
+      }));
+      return;
+    }
+
+    // Skills line — long comma-separated list
+    if (line.includes(',') && line.split(',').length > 4 && !line.startsWith('-')) {
+      children.push(new Paragraph({
+        children: [
+          new TextRun({
+            text: line,
+            size: SIZE_BODY,
+            font: FONT,
+            color: COLOR_BODY,
+          })
+        ],
+        spacing: { before: 40, after: 40 },
+        alignment: AlignmentType.LEFT,
+      }));
+      return;
+    }
+
+    // Education and certification lines — bold main text, italics year
+    if (
+      line.includes(' in ') ||
+      line.includes('Bachelor') || line.includes('Master') ||
+      line.includes('B.Tech') || line.includes('B.E') ||
+      line.includes('MBA') || line.includes('PhD') ||
+      line.includes('Certified') || line.includes('Certificate')
+    ) {
+      const yearMatch = line.match(/\d{4}/);
+      const yearStr   = yearMatch ? yearMatch[0] : '';
+      const mainText  = yearStr
+        ? line.replace(yearStr, '').trim().replace(/,?\s*$/, '')
+        : line;
+
+      children.push(new Paragraph({
+        children: [
+          new TextRun({
+            text: mainText,
+            bold: true,
+            size: SIZE_BODY,
+            font: FONT,
+            color: COLOR_BODY,
+          }),
+          yearStr ? new TextRun({
+            text: '  ' + yearStr,
+            size: SIZE_SMALL,
+            font: FONT,
+            color: COLOR_DATE,
+            italics: true,
+          }) : null,
+        ].filter(Boolean),
+        spacing: { before: 60, after: 40 },
+        alignment: AlignmentType.LEFT,
+      }));
+      return;
+    }
+
+    // Default: standard body paragraph
     children.push(new Paragraph({
-      children: [new TextRun({ text: line, size: 20, font: 'Calibri' })],
-      spacing: { after: 60 }
+      children: [
+        new TextRun({
+          text: line,
+          size: SIZE_BODY,
+          font: FONT,
+          color: COLOR_BODY,
+        })
+      ],
+      spacing: { before: 40, after: 40 },
+      alignment: AlignmentType.LEFT,
     }));
   });
 
+  // Document: tight margins to maximise one-page content
+  // 0.5 inch (720 twips) on all sides — professional standard minimum
   const doc = new Document({
+    styles: {
+      default: {
+        document: {
+          run: {
+            font: FONT,
+            size: SIZE_BODY,
+            color: COLOR_BODY,
+          },
+          paragraph: {
+            // 1.15 line spacing — tight but readable, saves ~15% vertical space
+            spacing: { line: 276, lineRule: 'auto' },
+          }
+        }
+      }
+    },
     sections: [{
       properties: {
         page: {
-          margin: { top: 720, right: 720, bottom: 720, left: 720 } // 0.5 inch margins
+          margin: {
+            top:    720,   // 0.5 inch
+            right:  720,   // 0.5 inch
+            bottom: 720,   // 0.5 inch
+            left:   720,   // 0.5 inch
+          },
+          size: {
+            width:  12240, // 8.5 inches — US Letter standard
+            height: 15840, // 11 inches
+          }
         }
       },
-      children
+      children,
     }]
   });
 
